@@ -1,0 +1,2 @@
+#define Snaze_VERSION_MAJOR @Snaze_VERSION_MAJOR@
+#define Snaze_VERSION_MINOR @Snaze_VERSION_MINOR@
