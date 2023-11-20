@@ -7,7 +7,8 @@ enum Element {
    Road,
    SnakeHead,
    SnakeTail,
-   Fruit,
+   Food,
+   None,
 };
 
 Element charToElement(char character_);

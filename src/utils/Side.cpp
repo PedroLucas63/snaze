@@ -1,8 +1,7 @@
 #include "Side.hpp"
 
 Position getMovement(Side side_) {
-   switch (side_)
-   {
+   switch (side_) {
    case Left:
       return Position(-1, 0);
       break;

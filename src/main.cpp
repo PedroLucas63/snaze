@@ -1,20 +1,15 @@
-/**!
- *  This program implements the Snake simulation.
- *  @author Selan R. dos Santos
- */
-
-#include "simulation.h"
-using namespace sg;
+#include "GameController.hpp"
 
 int main(int argc, char* argv[]) {
-  // SnazeSimulation is a singleton.
-  SnazeSimulation::initialize(argc, argv);
-  // The Game Loop.
-  while (not SnazeSimulation::is_over()) {
-    SnazeSimulation::process_events();
-    SnazeSimulation::update();
-    SnazeSimulation::render();
-  }
-  return 0;
-}
+   GameController& game { GameController::getInstance() };
+   game.initialize(argc, argv);
 
+   while (not game.isOver()) {
+      game.process();
+      game.update();
+      game.render();
+   }
+
+   game.destruct();
+   return 0;
+}

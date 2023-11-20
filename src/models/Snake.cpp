@@ -16,9 +16,12 @@ Side Snake::getSide() const {
    return m_side;
 }
 
-
 size_t Snake::size() const {
    return m_body.size();
+}
+
+void Snake::setHead(Position const& position_) {
+   m_body.assign({ position_ });
 }
 
 void Snake::addTail() {
@@ -38,10 +41,10 @@ void Snake::toWalk(Side side_) {
       }
    }
 
-   Position move {getMovement(side_)};
+   Position move { getMovement(side_) };
 
-   for (auto index {m_body.size() - 1}; index != 0; --index) {
-      m_body[index] = m_body[index - 1];
+   for (auto index { m_body.size() - 1 }; index != 0; --index) {
+      m_body[ index ] = m_body[ index - 1 ];
    }
 
    m_body.front() += move;
@@ -50,10 +53,10 @@ void Snake::toWalk(Side side_) {
 }
 
 bool Snake::hasConflict() {
-   Position head {getHead()};
+   Position head { getHead() };
 
-   for (auto index {1}; index != m_body.size(); ++index) {
-      if (head == m_body[index]) {
+   for (auto index { 1 }; index != m_body.size(); ++index) {
+      if (head == m_body[ index ]) {
          return true;
       }
    }
