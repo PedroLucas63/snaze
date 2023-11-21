@@ -15,7 +15,8 @@ include_directories(
   src/models
   src/utils
   src/controller
-  src/libs
+  src/libs/cli
+  src/libs/format
   src/view)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -30,6 +31,7 @@ add_executable(
   src/models/Scene.cpp
   src/utils/Element.cpp
   src/utils/Side.cpp
+  src/view/View.cpp
   src/controller/GameController.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
