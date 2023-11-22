@@ -4,10 +4,11 @@
 #include "Player.hpp"
 
 class RandomPlayer : public Player {
-   RandomPlayer() : Player() {}
-   RandomPlayer(Scene scene_) : Player(scene_) {}
+   public:
+   RandomPlayer() : Player() { }
+   RandomPlayer(Scene scene_) : Player(scene_) { }
 
-   void RandomPlayer::thinking(Snake snake_, Fruit fruit_) override;
+   void thinking(Snake snake_, Fruit fruit_) override;
 };
 
 #endif /// RANDOM_PLAYER_HPP_

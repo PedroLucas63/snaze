@@ -11,6 +11,7 @@ class Snake {
    Snake(int x_, int y_);
 
    Position getHead() const;
+   Position getTail(size_t index_) const;
    Side getSide() const;
    size_t getSize() const;
 

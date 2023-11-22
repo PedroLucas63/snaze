@@ -31,6 +31,7 @@ add_executable(
   src/models/Fruit.cpp
   src/models/Game.cpp
   src/models/Player.cpp
+  src/models/players/Random.cpp
   src/models/Scene.cpp
   src/models/Snake.cpp
   src/utils/Element.cpp

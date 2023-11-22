@@ -10,26 +10,20 @@ Snake::Snake(int x_, int y_) : m_side(None) {
    m_tail_position = getHead();
 }
 
-Position Snake::getHead() const {
-   return m_body.front();
-}
+Position Snake::getHead() const { return m_body.front(); }
 
-Side Snake::getSide() const {
-   return m_side;
-}
+Position Snake::getTail(size_t index_) const { return m_body[index_]; }
 
-size_t Snake::getSize() const {
-   return m_body.size();
-}
+Side Snake::getSide() const { return m_side; }
+
+size_t Snake::getSize() const { return m_body.size(); }
 
 void Snake::restart(Position const& position_) {
    m_body.assign({ position_ });
    m_side = None;
 }
 
-void Snake::toGrow() {
-   m_body.push_back(m_tail_position);
-}
+void Snake::toGrow() { m_body.push_back(m_tail_position); }
 
 void Snake::toWalk(Side side_) {
    m_tail_position = m_body.back();
@@ -45,7 +39,7 @@ bool Snake::hasConflict() const {
    Position head { getHead() };
 
    for (auto index { 1 }; index != getSize(); ++index) {
-      if (head == m_body[ index ]) {
+      if (head == m_body[index]) {
          return true;
       }
    }

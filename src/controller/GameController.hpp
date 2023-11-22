@@ -1,14 +1,15 @@
 #ifndef GAME_CONTROLLER_HPP_
 #define GAME_CONTROLLER_HPP_
 
-#include "Fruit.hpp"
+#include "Game.hpp"
+#include "Random.hpp"
 #include "Scene.hpp"
-#include "Snake.hpp"
 #include "Utils.hpp"
+#include "View.hpp"
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
-#include "View.hpp"
 
 constexpr int const DEFAULT_FPS { 24 };
 constexpr int const MINIMUM_FPS { 1 };
@@ -22,7 +23,7 @@ constexpr int const DEFAULT_FOODS { 10 };
 constexpr int const MINIMUM_FOODS { 1 };
 constexpr int const MAXIMUM_FOODS { 24 };
 
-constexpr char* const DEFAULT_PLAYER { "random" };
+constexpr char const* DEFAULT_PLAYER { "random" };
 
 class GameController {
    private:
@@ -40,10 +41,10 @@ class GameController {
 
    State m_state;
    std::vector<Scene> m_scenes;
-   View window;
-   Scene m_current_scene;
-   Fruit m_fruit;
-   Snake m_snake;
+   size_t m_current_scene;
+   Game m_game;
+   std::unique_ptr<Player> m_player;
+   View m_window;
 
    ///< Config members >//
    bool m_help;
@@ -58,6 +59,12 @@ class GameController {
 
    ///< Process functions >//
    void processArguments();
+   void processData();
+   void readLevelFile();
+   void initGame();
+   void createPlayer();
+   void updateGame();
+
 
    public:
    GameController() = default;

@@ -1,14 +1,79 @@
 #include "Random.hpp"
+#include <map>
+#include <random>
 
 void RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
-   /// Mapa de movimentos possíveis com peso (pegar ultimo movimento).
-   /// Peso recebe 0 para movimento não cumulativo ao atual.
-   /// Movimentos cumulativos são testados com o corpo (0 se conflito).
-   /// Movimentos cumulativos são testados com o cenário (0 se conflito).
-   /// Movimentos sem conflito desejados recebem incremento no peso:
-      /// A fruta está a esquerda da cobra e o movimento a esquerda ainda é valido? Peso do left recebe +2.
-      /// A fruta está a direita da cobra e o movimento a direita não é valido? Nada a fazer.
-   /// Escolha de movimento de forma aleatória baseada nos pesos.
-      /// Situação indefinida para todas posições com peso 0.
-   /// Inclui o movimento a Stack e para.
+   std::map<Side, int> moves {
+      { Left, 1},
+      {Right, 1},
+      {   Up, 1},
+      { Down, 1}
+   };
+
+   Side last_move { snake_.getSide() };
+   for (auto& move : moves) {
+      if (not cumulativeMovements(move.first, last_move)) {
+         move.second = 0;
+      }
+   }
+
+   Position head { snake_.getHead() };
+   Position left { movementToSide(head, Left) };
+   Position right { movementToSide(head, Right) };
+   Position up { movementToSide(head, Up) };
+   Position down { movementToSide(head, Down) };
+
+   for (auto body { 1 }; body != snake_.getSize(); ++body) {
+      if (left == snake_.getTail(body)) {
+         moves[Left] = 0;
+      } else if (right == snake_.getTail(body)) {
+         moves[Right] = 0;
+      } else if (up == snake_.getTail(body)) {
+         moves[Up] = 0;
+      } else if (down == snake_.getTail(body)) {
+         moves[Down] = 0;
+      }
+   }
+
+   if (m_scene.getElement(left) != Road) {
+      moves[Left] = 0;
+   }
+   if (m_scene.getElement(right) != Road) {
+      moves[Right] = 0;
+   }
+   if (m_scene.getElement(up) != Road) {
+      moves[Up] = 0;
+   }
+   if (m_scene.getElement(down) != Road) {
+      moves[Down] = 0;
+   }
+
+   Position fruit_pos { fruit_.getPosition() };
+   if (moves[Left] && head.x > fruit_pos.x) {
+      moves[Left] += 3;
+   }
+   if (moves[Right] && head.x < fruit_pos.x) {
+      moves[Right] += 3;
+   }
+   if (moves[Up] && head.y > fruit_pos.y) {
+      moves[Up] += 3;
+   }
+   if (moves[Down] && head.y < fruit_pos.y) {
+      moves[Down] += 3;
+   }
+
+   std::random_device rd;
+   std::mt19937 gen(rd());
+
+   std::vector<Side> sides;
+   std::vector<int> weights;
+
+   for (auto move : moves) {
+      sides.push_back(move.first);
+      weights.push_back(move.second);
+   }
+
+   std::discrete_distribution<> dist { weights.begin(), weights.end() };
+
+   m_moves.push(sides[dist(gen)]);
 }

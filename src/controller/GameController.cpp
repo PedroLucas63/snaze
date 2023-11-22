@@ -1,5 +1,6 @@
 #include "Cli.hpp"
 #include "GameController.hpp"
+#include "fstring.hpp"
 
 GameController* GameController::m_instance = nullptr;
 
@@ -54,6 +55,9 @@ void GameController::process() {
       case Starting:
          processArguments();
          break;
+      case Welcome:
+         processData();
+         break;
       default:
          break;
    }
@@ -76,7 +80,8 @@ void GameController::update() {
 void GameController::render() {
    switch (m_state) {
       case Helping:
-         window.renderHelp(DEFAULT_FPS, DEFAULT_LIVES, DEFAULT_FOODS, DEFAULT_PLAYER);
+         m_window.renderHelp(
+           DEFAULT_FPS, DEFAULT_LIVES, DEFAULT_FOODS, DEFAULT_PLAYER);
          break;
       default:
          break;
@@ -97,7 +102,7 @@ void GameController::processArguments() {
       m_foods = DEFAULT_FOODS;
    }
 
-   std::vector<std::string> accepted_players {DEFAULT_PLAYER};
+   std::vector<std::string> accepted_players { DEFAULT_PLAYER };
    bool found { false };
 
    for (auto player : accepted_players) {
@@ -111,9 +116,87 @@ void GameController::processArguments() {
       m_type_player = DEFAULT_PLAYER;
    }
 
-   std::ifstream input_file {m_file};
+   std::ifstream input_file { m_file };
 
    if (not input_file.is_open()) {
-      m_help  = true;
+      m_help = true;
+   }
+}
+
+void GameController::processData() {
+   readLevelFile();
+
+   if (not m_help) {
+      initGame();
+      createPlayer();
+   }
+}
+
+void GameController::readLevelFile() {
+   std::ifstream input_file { m_file };
+   ext::fstring level_size;
+
+   while (std::getline(input_file >> std::ws, level_size)) {
+      int width, height;
+
+      try {
+         size_t position;
+         height = std::stoi(level_size, &position);
+         level_size.erase(level_size.cbegin(), level_size.cbegin() + position);
+         width = std::stoi(level_size, &position);
+      } catch (...) { break; }
+
+      std::vector<std::vector<char>> board;
+      ext::fstring line;
+
+      while (std::getline(input_file, line) && board.size() != height) {
+         std::vector<char> columns;
+
+         for (auto column : line) {
+            columns.push_back(column);
+         }
+
+         if (columns.size() != width) {
+            break;
+         } else {
+            board.push_back(columns);
+         }
+      }
+
+      if (board.size() != height) {
+         break;
+      } else {
+         Scene scene { board };
+
+         if (scene.validate()) {
+            m_scenes.push_back(scene);
+         } else {
+            break;
+         }
+      }
+   }
+
+   if (m_scenes.empty()) {
+      m_help = true;
+   }
+}
+
+void GameController::initGame() {
+   m_game = Game(m_scenes.front(), m_lives, m_foods);
+   m_current_scene = 0;
+}
+
+void GameController::createPlayer() {
+   if (m_type_player == DEFAULT_PLAYER) {
+      m_player = std::make_unique<RandomPlayer>();
+   }
+}
+
+void GameController::updateGame() {
+   ++m_current_scene;
+
+   if (m_current_scene != m_scenes.size()) {
+      m_game
+        = Game(m_scenes[m_current_scene], m_lives, m_foods, m_game.getScore());
    }
 }

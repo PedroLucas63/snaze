@@ -1,16 +1,16 @@
 #ifndef PLAYER_HPP_
 #define PLAYER_HPP_
 
+#include "Fruit.hpp"
 #include "Scene.hpp"
 #include "Snake.hpp"
-#include "Fruit.hpp"
 #include "Utils.hpp"
 #include <stack>
 
 class Player {
    public:
    Player() = default;
-   Player(Scene scene_) : m_scene(scene_), m_side(None) {}
+   Player(Scene scene_) : m_scene(scene_), m_side(None) { }
 
    virtual void thinking(Snake snake_, Fruit fruit_);
    std::stack<Side> getMoves() const;

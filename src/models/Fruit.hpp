@@ -2,20 +2,21 @@
 #define FRUIT_HPP_
 
 #include "Utils.hpp"
+#include <cstddef>
 
 class Fruit {
    public:
    Fruit() = default;
-   Fruit(int width_, int height_);
+   Fruit(size_t width_, size_t height_);
 
    Position getPosition() const;
    void randomPosition();
 
-   void setSceneSize(int width_, int height_);
+   void setSceneSize(size_t width_, size_t height_);
 
    private:
    Position m_position;
-   int m_width, m_height;
+   size_t m_width, m_height;
 };
 
 #endif /// FRUIT_HPP_
