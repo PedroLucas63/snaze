@@ -12,18 +12,20 @@ class Snake {
 
    Position getHead() const;
    Side getSide() const;
-   size_t size() const;
+   size_t getSize() const;
 
-   void setHead(Position const& position_);
-   void addTail();
+   void restart(Position const& position_);
+   void toGrow();
 
    void toWalk(Side side_);
-   bool hasConflict();
+   bool hasConflict() const;
 
    private:
    std::vector<Position> m_body;
+   Position m_tail_position;
    Side m_side;
-   size_t m_moves;
+
+   void walk();
 };
 
 #endif /// SNAKE_HPP_

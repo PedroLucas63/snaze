@@ -1,26 +1,15 @@
 #include "Player.hpp"
 
-void Player::thinking(Scene scene_, Fruit fruit_, Snake snake_) {
-   m_movements.push(Right);
+void Player::thinking(Snake snake_, Fruit fruit_) {
+   m_moves.push(Right);
 }
 
-std::stack<Side> Player::getMovements() {
-   std::stack<Side> moves { m_movements };
-
-   while (!m_movements.empty()) {
-      m_movements.pop();
-   }
-
-   return moves;
+std::stack<Side> Player::getMoves() const {
+   return m_moves;
 }
 
-bool Player::hasCollisionWithWall(Scene scene_, Fruit fruit_, Snake snake_) {
-   Position head { snake_.getHead() };
-   Element block { charToElement(scene_[ head.y ][ head.x ]) };
-
-   if (block == Wall || block == InvisibleWall) {
-      return true;
+void Player::clearMoves() {
+   while (not m_moves.empty()) {
+      m_moves.pop();
    }
-
-   return false;
 }

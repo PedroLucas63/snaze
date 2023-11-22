@@ -5,10 +5,8 @@ enum Element {
    Wall,
    InvisibleWall,
    Road,
-   SnakeHead,
-   SnakeTail,
-   Food,
-   None,
+   Begin,
+   Unknown,
 };
 
 Element charToElement(char character_);

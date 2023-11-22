@@ -1,20 +1,15 @@
 #include "Side.hpp"
 
-Position getMovement(Side side_) {
-   switch (side_) {
-   case Left:
-      return Position(-1, 0);
-      break;
-   case Right:
-      return Position(1, 0);
-      break;
-   case Up:
-      return Position(0, 1);
-      break;
-   case Down:
-      return Position(0, -1);
-      break;
-   default:
-      break;
+bool cumulativeMovements(Side first_, Side second_) {
+   if (first_ == Left && second_ == Right) {
+      return false;
+   } else if (first_ == Right && second_ == Left) {
+      return false;
+   } else if (first_ == Up && second_ == Down) {
+      return false;
+   } else if (first_ == Down && second_ == Up) {
+      return false;
    }
+
+   return true;
 }

@@ -1,22 +1,37 @@
 #include "Scene.hpp"
 
-Scene::Scene(size_t width_, size_t height_) {
-   m_blocks
-     = std::vector<std::vector<char>>(height_, std::vector<char>(width_));
+std::vector<std::vector<char>> Scene::getBoard() const {
+   return m_board;
 }
 
-std::vector<char>& Scene::operator[](size_t y_) {
-   return m_blocks[ y_ ];
+Element Scene::getElement(int x_, int y_) const {
+   return charToElement(m_board[y_][x_]);
 }
 
-char Scene::getBlock(size_t x_, size_t y_) {
-   return m_blocks[ y_ ][ x_ ];
+Element Scene::getElement(Position position_) const {
+   return charToElement(m_board[position_.y][position_.x]);
 }
 
 size_t Scene::getWidth() const {
-   return m_blocks.front().size();
+   return m_board.front().size();
 }
 
 size_t Scene::getHeight() const {
-   return m_blocks.size();
+   return m_board.size();
+}
+
+Position Scene::getBegin() const {
+   return m_begin;
+}
+
+Position Scene::searchBegin() const {
+   for (auto y { 0 }; y != getHeight(); ++y) {
+      for (auto x { 0 }; x != getWidth(); ++x) {
+         if (charToElement(m_board[y][x]) == Begin) {
+            return Position(x, y);
+         }
+      }
+   }
+
+   return {-1, -1};
 }

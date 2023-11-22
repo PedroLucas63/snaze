@@ -8,8 +8,9 @@ enum Side {
    Right,
    Up,
    Down,
+   None,
 };
 
-Position getMovement(Side side_);
+bool cumulativeMovements(Side first_, Side second_);
 
 #endif /// SIDE_HPP_

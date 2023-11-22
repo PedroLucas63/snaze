@@ -13,6 +13,7 @@ include_directories(
   PUBLIC
   "${PROJECT_BINARY_DIR}"
   src/models
+  src/models/players
   src/utils
   src/controller
   src/libs/cli
@@ -26,10 +27,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 add_executable(
   Snaze
   src/main.cpp
-  src/models/Snake.cpp
+  src/models/players/Random.cpp
   src/models/Fruit.cpp
+  src/models/Game.cpp
+  src/models/Player.cpp
   src/models/Scene.cpp
+  src/models/Snake.cpp
   src/utils/Element.cpp
+  src/utils/Position.cpp
   src/utils/Side.cpp
   src/view/View.cpp
   src/controller/GameController.cpp)

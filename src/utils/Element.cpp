@@ -12,17 +12,11 @@ Element charToElement(char character_) {
       return Road;
       break;
    case '&':
-      return SnakeHead;
-      break;
-   case '*':
-      return SnakeTail;
-      break;
-   case 'o':
-      return Food;
+      return Begin;
       break;
    default:
       break;
    }
 
-   return None;
+   return Unknown;
 }

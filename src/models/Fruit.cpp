@@ -1,18 +1,19 @@
 #include "Fruit.hpp"
-#include <cstdlib>
-#include <ctime>
+#include <random>
 
 Fruit::Fruit(int width_, int height_) : m_width(width_), m_height(height_) {
-   std::srand(std::time(nullptr));
    randomPosition();
 }
 
 Position Fruit::getPosition() const { return m_position; }
-void Fruit::randomPosition() {
-   int x { std::rand() % m_width };
-   int y { std::rand() % m_height };
 
-   m_position = Position(x, y);
+void Fruit::randomPosition() {
+   std::random_device rand;
+   std::mt19937 mt(rand);
+   std::uniform_int_distribution gen_x(0, m_width - 1);
+   std::uniform_int_distribution gen_y(0, m_height - 1);
+
+   m_position = Position(gen_x(mt), gen_y(mt));
 }
 
 void Fruit::setSceneSize(int width_, int height_) {
