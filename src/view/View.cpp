@@ -78,6 +78,13 @@ void View::renderHelp(int default_fps, int default_lives, int default_foods,
      << default_player << ".\n";
 }
 
+void View::renderInformations(size_t levels_, int lives_, int foods_) {
+   std::cout << std::string(WIDTH, '-') << "\n";
+   std::cout << "Levels loaded: " << levels_ << " | Snake lives: " << lives_ << " | Apples to eat: " << foods_ << "\n";
+   std::cout << std::string(WIDTH, '-') << "\n";
+   std::cout << " >>> Press <ENTER> to start the game!\n";
+}
+
 void View::renderPlay(Game game_, int lives_base_, int foods_) {
    renderTitle();
    renderGamingInfo(game_, lives_base_, foods_);
@@ -85,8 +92,9 @@ void View::renderPlay(Game game_, int lives_base_, int foods_) {
 }
 
 void View::renderGamingInfo(Game game_, int lives_base_, int foods_) {
-   ext::fstring hearts { game_.getLives(), 'H' };
-   hearts += ext::fstring { lives_base_ - game_.getLives(), 'L' };
+   size_t lives { static_cast<size_t>(game_.getLives()) };
+   ext::fstring hearts { lives, 'H' };
+   hearts += ext::fstring { lives_base_ - lives, 'L' };
    hearts.color(ext::cfg::red);
 
    ext::fstring score { std::to_string(game_.getScore()) };
@@ -119,54 +127,10 @@ void View::renderBoard(Game game_) {
                std::cout << " ";
                break;
             case Road:
-               if (snake.getHead() == pos) {
-                  std::cout << "◊";
-                  break;
-               } else {
-                  bool found { false };
-
-                  for (size_t body { 1 }; body != snake.getSize(); ++body) {
-                     if (snake.getTail(body) == pos) {
-                        std::cout << "●";
-                        found = true;
-                     }
-                  }
-
-                  if (found) {
-                     break;
-                  }
-
-                  if (fruit.getPosition() == pos) {
-                     std::cout << "☻";
-                  } else {
-                     std::cout << " ";
-                  }
-               }
+               renderRoadIcon(snake, fruit, pos);
                break;
             case Begin:
-               if (snake.getHead() == pos) {
-                  std::cout << "◊";
-                  break;
-               } else {
-                  bool found { false };
-
-                  for (size_t body { 1 }; body != snake.getSize(); ++body) {
-                     if (snake.getTail(body) == pos) {
-                        std::cout << "●";
-                        found = true;
-                     }
-                  }
-
-                  if (found) {
-                     break;
-                  }
-
-                  if (fruit.getPosition() == pos) {
-                     std::cout << "☻";
-                  } else {
-                     std::cout << " ";
-                  }
-               }
+               renderRoadIcon(snake, fruit, pos);
                break;
             default:
                break;
@@ -174,4 +138,31 @@ void View::renderBoard(Game game_) {
       }
       std::cout << "\n";
    }
+}
+void View::renderRoadIcon(Snake snake_, Fruit fruit_, Position road_position_) {
+   if (snake_.getHead() == road_position_) {
+      std::cout << "◊";
+      return;
+   }
+
+   for (size_t body { 1 }; body != snake_.getSize(); ++body) {
+      if (snake_.getTail(body) == road_position_) {
+         std::cout << "●";
+         return;
+      }
+   }
+
+   if (fruit_.getPosition() == road_position_) {
+      std::cout << "☻";
+   } else {
+      std::cout << " ";
+   }
+}
+
+void View::renderWin() {
+   std::cout << "\nHey, your snake won!\n";
+}
+
+void View::renderLost() {
+   std::cout << "\nHey, your snake lost!\n";
 }

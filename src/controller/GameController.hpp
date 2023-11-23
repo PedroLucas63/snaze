@@ -3,6 +3,7 @@
 
 #include "Game.hpp"
 #include "Random.hpp"
+#include "Greedy.hpp"
 #include "Scene.hpp"
 #include "Utils.hpp"
 #include "View.hpp"
@@ -24,6 +25,7 @@ constexpr int const MINIMUM_FOODS { 1 };
 constexpr int const MAXIMUM_FOODS { 24 };
 
 constexpr char const* DEFAULT_PLAYER { "random" };
+constexpr char const* GREEDY_PLAYER { "greedy" };
 
 class GameController {
    private:
@@ -31,9 +33,12 @@ class GameController {
       Starting,
       Welcome,
       Helping,
+      Information,
       Playing,
       Thinking,
       Update,
+      Winner,
+      Lost,
       Ending,
    };
 
@@ -67,6 +72,10 @@ class GameController {
    void initGame();
    void createPlayer();
    void updateGame();
+
+   void pause();
+
+   void updateSituation();
 
    bool winnerGame();
 

@@ -3,6 +3,7 @@
 #include "fstring.hpp"
 #include <chrono>
 #include <thread>
+#include <string>
 #include <iostream>
 
 GameController* GameController::m_instance = nullptr;
@@ -61,6 +62,9 @@ void GameController::process() {
       case Welcome:
          processData();
          break;
+      case Information:
+         pause();
+         break;
       case Thinking:
          processMovements();
          break;
@@ -78,16 +82,19 @@ void GameController::update() {
          m_state = Welcome;
          break;
       case Welcome:
-         m_state = m_help ? Helping : Playing;
+         m_state = m_help ? Helping : Information;
+         break;
+      case Information:
+         m_state = Playing;
          break;
       case Playing:
          m_state = Thinking;
          break;
       case Thinking:
-         m_state = m_game.defeat() ? Ending : Update;
+         m_state = Update;
          break;
       case Update:
-         m_state = winnerGame() ? Ending : Playing;
+         updateSituation();
          break;
       default:
          m_state = Ending;
@@ -101,9 +108,18 @@ void GameController::render() {
          m_window.renderHelp(
            DEFAULT_FPS, DEFAULT_LIVES, DEFAULT_FOODS, DEFAULT_PLAYER);
          break;
+      case Information:
+         m_window.renderInformations(m_scenes.size(), m_lives, m_foods);
+         break;
       case Playing:
-         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / m_fps));
          m_window.renderPlay(m_game, m_lives, m_foods);
+         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / m_fps));
+         break;
+      case Winner:
+         m_window.renderWin();
+         break;
+      case Lost:
+         m_window.renderLost();
          break;
       default:
          break;
@@ -124,7 +140,7 @@ void GameController::processArguments() {
       m_foods = DEFAULT_FOODS;
    }
 
-   std::vector<std::string> accepted_players { DEFAULT_PLAYER };
+   std::vector<std::string> accepted_players { DEFAULT_PLAYER, GREEDY_PLAYER };
    bool found { false };
 
    for (auto player : accepted_players) {
@@ -154,6 +170,7 @@ void GameController::processData() {
    }
 }
 
+/// TODO: ONE MOVEMENT PER TIME
 void GameController::processMovements() {
    m_player->thinking(m_game.getSnake(), m_game.getFruit());
    auto moves { m_player->getMoves() };
@@ -232,6 +249,8 @@ void GameController::initGame() {
 void GameController::createPlayer() {
    if (m_type_player == DEFAULT_PLAYER) {
       m_player = std::make_unique<RandomPlayer>(m_game.getScene());
+   } else if (m_type_player == GREEDY_PLAYER) {
+      m_player = std::make_unique<GreedyPlayer>(m_game.getScene());
    }
 }
 
@@ -242,6 +261,21 @@ void GameController::updateGame() {
       m_game = Game(
         m_scenes[m_current_scene], m_lives, m_foods + 1, m_game.getScore());
       createPlayer();
+   }
+}
+
+void GameController::pause() {
+   std::string buffer;
+   std::getline(std::cin, buffer);
+}
+
+void GameController::updateSituation() {
+   if (m_game.defeat()) {
+      m_state = Lost;
+   } else if (winnerGame()) {
+      m_state = Winner;
+   } else {
+      m_state = Playing;
    }
 }
 
