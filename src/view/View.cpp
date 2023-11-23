@@ -80,7 +80,8 @@ void View::renderHelp(int default_fps, int default_lives, int default_foods,
 
 void View::renderInformations(size_t levels_, int lives_, int foods_) {
    std::cout << std::string(WIDTH, '-') << "\n";
-   std::cout << "Levels loaded: " << levels_ << " | Snake lives: " << lives_ << " | Apples to eat: " << foods_ << "\n";
+   std::cout << "Levels loaded: " << levels_ << " | Snake lives: " << lives_
+             << " | Apples to eat: " << foods_ << "\n";
    std::cout << std::string(WIDTH, '-') << "\n";
    std::cout << " >>> Press <ENTER> to start the game!\n";
 }
@@ -153,16 +154,12 @@ void View::renderRoadIcon(Snake snake_, Fruit fruit_, Position road_position_) {
    }
 
    if (fruit_.getPosition() == road_position_) {
-      std::cout << "☻";
+      std::cout << "";
    } else {
       std::cout << " ";
    }
 }
 
-void View::renderWin() {
-   std::cout << "\nHey, your snake won!\n";
-}
+void View::renderWin() { std::cout << "\nHey, your snake won!\n"; }
 
-void View::renderLost() {
-   std::cout << "\nHey, your snake lost!\n";
-}
+void View::renderLost() { std::cout << "\nHey, your snake lost!\n"; }

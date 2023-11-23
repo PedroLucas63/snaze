@@ -1,7 +1,8 @@
 #include "Fruit.hpp"
 #include <random>
 
-Fruit::Fruit(size_t width_, size_t height_) : m_width(width_), m_height(height_) {
+Fruit::Fruit(size_t width_, size_t height_)
+    : m_width(width_), m_height(height_) {
    randomPosition();
 }
 

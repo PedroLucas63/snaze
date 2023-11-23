@@ -2,8 +2,8 @@
 #define GAME_CONTROLLER_HPP_
 
 #include "Game.hpp"
-#include "Random.hpp"
 #include "Greedy.hpp"
+#include "Random.hpp"
 #include "Scene.hpp"
 #include "Utils.hpp"
 #include "View.hpp"

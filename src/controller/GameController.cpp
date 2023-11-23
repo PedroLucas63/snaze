@@ -2,9 +2,9 @@
 #include "GameController.hpp"
 #include "fstring.hpp"
 #include <chrono>
-#include <thread>
-#include <string>
 #include <iostream>
+#include <string>
+#include <thread>
 
 GameController* GameController::m_instance = nullptr;
 

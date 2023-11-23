@@ -43,7 +43,7 @@ bool Game::hasConflict() const {
 
    if (m_snake.hasConflict()) {
       return true;
-   } else if (m_scene.getElement(head.x, head.y) ==  Wall) {
+   } else if (m_scene.getElement(head.x, head.y) == Wall) {
       return true;
    }
 

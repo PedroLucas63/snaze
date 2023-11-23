@@ -37,16 +37,20 @@ void RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
       }
    }
 
-   if (m_scene.getElement(left) == Wall || m_scene.getElement(left) == InvisibleWall) {
+   if (m_scene.getElement(left) == Wall
+     || m_scene.getElement(left) == InvisibleWall) {
       moves[Left] = 0;
    }
-   if (m_scene.getElement(right) == Wall || m_scene.getElement(right) == InvisibleWall) {
+   if (m_scene.getElement(right) == Wall
+     || m_scene.getElement(right) == InvisibleWall) {
       moves[Right] = 0;
    }
-   if (m_scene.getElement(up) == Wall || m_scene.getElement(up) == InvisibleWall) {
+   if (m_scene.getElement(up) == Wall
+     || m_scene.getElement(up) == InvisibleWall) {
       moves[Up] = 0;
    }
-   if (m_scene.getElement(down) == Wall || m_scene.getElement(down) == InvisibleWall) {
+   if (m_scene.getElement(down) == Wall
+     || m_scene.getElement(down) == InvisibleWall) {
       moves[Down] = 0;
    }
 

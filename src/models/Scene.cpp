@@ -21,7 +21,7 @@ bool Scene::validate() const {
 
    for (auto line : m_board) {
       for (auto column : line) {
-         Element element {charToElement(column)};
+         Element element { charToElement(column) };
 
          if (element == Unknown) {
             return false;
