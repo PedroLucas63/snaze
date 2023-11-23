@@ -3,6 +3,8 @@
 #include <random>
 
 void RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
+   clearMoves();
+
    std::map<Side, int> moves {
       { Left, 1},
       {Right, 1},

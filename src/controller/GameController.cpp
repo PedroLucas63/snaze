@@ -170,25 +170,23 @@ void GameController::processData() {
    }
 }
 
-/// TODO: ONE MOVEMENT PER TIME
 void GameController::processMovements() {
-   m_player->thinking(m_game.getSnake(), m_game.getFruit());
-   auto moves { m_player->getMoves() };
-
-   while (not moves.empty()) {
-      if (not m_game.toWalk(moves.top())) {
-         break;
-      }
-
-      moves.pop();
+   if (m_player->getMoves().empty()) {
+      m_player->thinking(m_game.getSnake(), m_game.getFruit());
    }
-
-   m_player->clearMoves();
 }
 
 void GameController::processResults() {
+   auto moves { m_player->getMoves() };
+
    if (m_game.winner()) {
       updateGame();
+   } else {
+      if (not m_game.toWalk(m_player->frontMovement())) {
+         m_player->clearMoves();
+      } else {
+         m_player->popMovement();
+      }
    }
 }
 

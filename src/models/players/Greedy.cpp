@@ -6,15 +6,9 @@
 /// TODO: CHECK LAST_SIDE, COMPACT CODE
 
 void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
+   clearMoves();
    std::vector<std::vector<int>> distances {m_scene.getHeight(), std::vector<int>(m_scene.getWidth(), DISTANCE_NON)};
    fillDistances(distances, fruit_.getPosition());
-
-   for (auto i : distances) {
-      for (auto c : i) {
-         std::cout << c << " ";
-      }
-      std::cout << "\n";
-   }
 
    Snake my_snake {snake_}; 
 
@@ -23,9 +17,8 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
 
       std::map<Side, int> side_distance;
 
-
       Position left {movementToSide(head, Left)};
-      if (distances[left.y][left.x] != DISTANCE_WALL) {
+      if (distances[left.y][left.x] != DISTANCE_WALL && cumulativeMovements(Left, my_snake.getSide())) {
          bool collision {false};
          for (size_t body {1}; body != my_snake.getSize(); ++body) {
             if (left == my_snake.getTail(body)) {
@@ -40,7 +33,7 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
       }
 
       Position right {movementToSide(head, Right)};
-      if (distances[right.y][right.x] != DISTANCE_WALL) {
+      if (distances[right.y][right.x] != DISTANCE_WALL && cumulativeMovements(Right, my_snake.getSide())) {
          bool collision {false};
          for (size_t body {1}; body != my_snake.getSize(); ++body) {
             if (right == my_snake.getTail(body)) {
@@ -55,7 +48,7 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
       }
 
       Position up {movementToSide(head, Up)};
-      if (distances[up.y][up.x] != DISTANCE_WALL) {
+      if (distances[up.y][up.x] != DISTANCE_WALL  && cumulativeMovements(Up, my_snake.getSide())) {
          bool collision {false};
          for (size_t body {1}; body != my_snake.getSize(); ++body) {
             if (up == my_snake.getTail(body)) {
@@ -70,7 +63,7 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
       }
 
       Position down {movementToSide(head, Down)};
-      if (distances[down.y][down.x] != DISTANCE_WALL) {
+      if (distances[down.y][down.x] != DISTANCE_WALL && cumulativeMovements(Down, my_snake.getSide())) {
          bool collision {false};
          for (size_t body {1}; body != my_snake.getSize(); ++body) {
             if (down == my_snake.getTail(body)) {
