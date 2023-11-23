@@ -15,8 +15,8 @@ class GreedyPlayer : public Player {
    void thinking(Snake snake_, Fruit fruit_) override;
 
    private:
-   void fillDistances(std::vector<std::vector<int>>& distances_,
-     Position position_, int distance_base_ = DISTANCE_DEFAULT);
+   void fillDistances(
+     std::vector<std::vector<int>>& distances_, Position position_);
    bool nonHasConflict(Snake snake_, Side side_);
 };
 

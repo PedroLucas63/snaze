@@ -1,7 +1,9 @@
 #include "Greedy.hpp"
 #include <algorithm>
+#include <deque>
 #include <iostream>
 #include <map>
+#include <stack>
 
 void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
    clearMoves();
@@ -10,77 +12,122 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
    fillDistances(distances, fruit_.getPosition());
 
    Snake my_snake { snake_ };
+   std::stack<std::pair<std::map<Side, bool>, size_t>> decisions;
+   std::deque<Side> moves;
 
    while (my_snake.getHead() != fruit_.getPosition()) {
       Position head { my_snake.getHead() };
-
       std::map<Side, int> side_distance;
 
-      if (nonHasConflict(my_snake, Left)) {
-         Position left { movementToSide(my_snake.getHead(), Left) };
-         side_distance[Left] = distances[left.y][left.x];
+      for (auto side : { Left, Right, Up, Down }) {
+         if (nonHasConflict(my_snake, side)) {
+            Position side_move { movementToSide(my_snake.getHead(), side) };
+            side_distance[side] = distances[side_move.y][side_move.x];
+         }
       }
 
-      if (nonHasConflict(my_snake, Right)) {
-         Position right { movementToSide(my_snake.getHead(), Right) };
-         side_distance[Right] = distances[right.y][right.x];
-      }
-
-      if (nonHasConflict(my_snake, Up)) {
-         Position up { movementToSide(my_snake.getHead(), Up) };
-         side_distance[Up] = distances[up.y][up.x];
-      }
-
-      if (nonHasConflict(my_snake, Down)) {
-         Position down { movementToSide(my_snake.getHead(), Down) };
-         side_distance[Down] = distances[down.y][down.x];
-      }
-
-      if (side_distance.empty()) {
-         m_moves.push(Left); /// Undefined movement
-         break;
-      } else {
+      if (not side_distance.empty()) {
          auto minimum_distance { std::min_element(side_distance.begin(),
            side_distance.end(),
            [](auto const& left, auto const& right) {
               return left.second < right.second;
            }) };
 
-         m_moves.push(minimum_distance->first);
+         moves.push_back(minimum_distance->first);
          my_snake.toWalk(minimum_distance->first);
+
+         if (side_distance.size() > 1) {
+            std::map<Side, bool> decision;
+
+            for (const auto& pair : side_distance) {
+               decision[pair.first] = pair.first == minimum_distance->first;
+            }
+
+            decisions.push({ decision, moves.size() - 1 });
+         }
+      } else {
+         if (decisions.empty()) {
+            moves.push_back(Left);
+            break;
+         } else {
+            Side possible_side { None };
+            bool clear;
+
+            do {
+               clear = false;
+               auto last_decision { decisions.top() };
+
+               for (auto const& side : last_decision.first) {
+                  if (not side.second) {
+                     clear = true;
+                     possible_side = side.first;
+                     break;
+                  }
+               }
+
+               if (not clear) {
+                  decisions.pop();
+               }
+            } while (not clear && not decisions.empty());
+
+            if (decisions.empty()) {
+               moves.push_back(Left);
+               break;
+            } else {
+               moves.erase(
+                 moves.cbegin() + decisions.top().second, moves.end());
+               my_snake = snake_;
+
+               for (auto const& move : moves) {
+                  my_snake.toWalk(move);
+               }
+
+               possible_side
+                 = possible_side == None ? Left : possible_side; /// Undefined
+               decisions.top().first[possible_side] = true;
+
+               moves.push_back(possible_side);
+               my_snake.toWalk(possible_side);
+            }
+         }
       }
+   }
+
+   /// Movement
+   for (auto const& move : moves) {
+      m_moves.push(move);
    }
 }
 
-void GreedyPlayer::fillDistances(std::vector<std::vector<int>>& distances_,
-  Position position_, int distance_base_) {
-   Element element { m_scene.getElement(position_) };
+void GreedyPlayer::fillDistances(
+  std::vector<std::vector<int>>& distances_, Position position_) {
+   std::queue<Position> queue;
+   queue.push(position_);
+   distances_[position_.y][position_.x] = DISTANCE_DEFAULT;
 
-   if (element == Wall || element == InvisibleWall) {
-      distances_[position_.y][position_.x] = DISTANCE_WALL;
-      return;
-   }
+   while (not queue.empty()) {
+      Position current { queue.front() };
+      queue.pop();
 
-   distances_[position_.y][position_.x] = distance_base_;
+      std::vector<Position> neighbors { movementToSide(current, Left),
+         movementToSide(current, Right),
+         movementToSide(current, Up),
+         movementToSide(current, Down) };
 
-   Position left { movementToSide(position_, Left) };
-   if (distances_[left.y][left.x] == DISTANCE_NON) {
-      fillDistances(distances_, left, distance_base_ + 1);
-   }
+      for (auto const& neighbor : neighbors) {
+         if (neighbor.x >= 0 && neighbor.x < m_scene.getWidth()
+           && neighbor.y >= 0 && neighbor.y < m_scene.getHeight()) {
+            if (distances_[neighbor.y][neighbor.x] == DISTANCE_NON) {
+               Element element { m_scene.getElement(neighbor) };
 
-   Position right { movementToSide(position_, Right) };
-   if (distances_[right.y][right.x] == DISTANCE_NON) {
-      fillDistances(distances_, right, distance_base_ + 1);
-   }
-
-   Position up { movementToSide(position_, Up) };
-   if (distances_[up.y][up.x] == DISTANCE_NON) {
-      fillDistances(distances_, up, distance_base_ + 1);
-   }
-
-   Position down { movementToSide(position_, Down) };
-   if (distances_[down.y][down.x] == DISTANCE_NON) {
-      fillDistances(distances_, down, distance_base_ + 1);
+               if (element != Wall && element != InvisibleWall) {
+                  distances_[neighbor.y][neighbor.x]
+                    = distances_[current.y][current.x] + 1;
+                  queue.push(neighbor);
+               }
+            }
+         }
+      }
    }
 }
 
