@@ -55,9 +55,23 @@ bool Game::catchFruit() const {
 }
 
 void Game::randomFruitPosition() {
-   m_fruit.randomPosition();
+   bool valide {false};
 
-   while (m_scene.getElement(m_fruit.getPosition()) != Road) {
+   while (not valide) {
       m_fruit.randomPosition();
+
+      Element element {m_scene.getElement(m_fruit.getPosition())};
+
+      if (element != Wall && element != InvisibleWall) {
+         bool collision { false };
+
+         for (size_t fill { 0 }; fill != m_snake.getSize(); ++fill) {
+            if (m_fruit.getPosition() == m_snake.getTail(fill)) {
+               collision = true;
+            }
+         }
+
+         valide = not collision;
+      }
    }
 }

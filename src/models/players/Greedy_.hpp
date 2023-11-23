@@ -1,9 +1,7 @@
-
-#ifndef GREEDY_HPP_
-#define GREEDY_HPP_
+#ifndef GREEDY_PLAYER_HPP_
+#define GREEDY_PLAYER_HPP_
 
 #include "Player.hpp"
-#include <vector>
 
 constexpr int const DISTANCE_DEFAULT { 1 };
 constexpr int const DISTANCE_WALL { -1 };
@@ -17,8 +15,9 @@ class GreedyPlayer : public Player {
    void thinking(Snake snake_, Fruit fruit_) override;
 
    private:
-   std::vector<std::vector<int>> fillDistances(
-     Position position_, std::vector<Position> non_used_);
-   bool conflictHasBody(Snake snake_, Position position_);
+   void fillDistances(
+     std::vector<std::vector<int>>& distances_, Position position_);
+   bool nonHasConflict(Snake snake_, Side side_);
 };
-#endif /// GREEDY_HPP_
+
+#endif /// GREEDY_PLAYER_HPP_

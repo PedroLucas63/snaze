@@ -1,109 +1,67 @@
 #include "Greedy.hpp"
-#include <algorithm>
-#include <deque>
 #include <iostream>
 #include <map>
-#include <stack>
 
 void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
-   clearMoves();
-   std::vector<std::vector<int>> distances { m_scene.getHeight(),
-      std::vector<int>(m_scene.getWidth(), DISTANCE_NON) };
-   fillDistances(distances, fruit_.getPosition());
-
    Snake my_snake { snake_ };
-   std::stack<std::pair<std::map<Side, bool>, size_t>> decisions;
-   std::deque<Side> moves;
+
+   std::vector<Position> exclude;
+   auto distances { fillDistances(fruit_.getPosition(), exclude) };
+   std::queue<Side> moves;
 
    while (my_snake.getHead() != fruit_.getPosition()) {
-      Position head { my_snake.getHead() };
-      std::map<Side, int> side_distance;
+      std::map<Side, int> move_distance;
 
-      for (auto side : { Left, Right, Up, Down }) {
-         if (nonHasConflict(my_snake, side)) {
-            Position side_move { movementToSide(my_snake.getHead(), side) };
-            side_distance[side] = distances[side_move.y][side_move.x];
+      for (Side const& side : { Left, Right, Up, Down }) {
+         Position move { movementToSide(my_snake.getHead(), side) };
+         if (distances[move.y][move.x] != DISTANCE_WALL
+           && cumulativeMovements(side, my_snake.getSide())) {
+            move_distance[side] = distances[move.y][move.x];
          }
       }
 
-      if (not side_distance.empty()) {
-         auto minimum_distance { std::min_element(side_distance.begin(),
-           side_distance.end(),
-           [](auto const& left, auto const& right) {
-              return left.second < right.second;
-           }) };
+      if (move_distance.empty()) {
+         moves.push(Left); /// Defeat
+         break;
+      }
 
-         moves.push_back(minimum_distance->first);
-         my_snake.toWalk(minimum_distance->first);
+      Side best_move { move_distance.begin()->first };
 
-         if (side_distance.size() > 1) {
-            std::map<Side, bool> decision;
+      for (auto const& move : move_distance) {
+         if (move.second < move_distance[best_move]) {
+            best_move = move.first;
+         }
+      }
 
-            for (const auto& pair : side_distance) {
-               decision[pair.first] = pair.first == minimum_distance->first;
-            }
-
-            decisions.push({ decision, moves.size() - 1 });
+      if (conflictHasBody(
+            my_snake, movementToSide(my_snake.getHead(), best_move))) {
+         exclude.push_back(movementToSide(my_snake.getHead(), best_move));
+         distances = fillDistances(fruit_.getPosition(), exclude);
+         my_snake = snake_;
+         while (not moves.empty()) {
+            moves.pop();
          }
       } else {
-         if (decisions.empty()) {
-            moves.push_back(Left);
-            break;
-         } else {
-            Side possible_side { None };
-            bool clear;
-
-            do {
-               clear = false;
-               auto last_decision { decisions.top() };
-
-               for (auto const& side : last_decision.first) {
-                  if (not side.second) {
-                     clear = true;
-                     possible_side = side.first;
-                     break;
-                  }
-               }
-
-               if (not clear) {
-                  decisions.pop();
-               }
-            } while (not clear && not decisions.empty());
-
-            if (decisions.empty()) {
-               moves.push_back(Left);
-               break;
-            } else {
-               moves.erase(
-                 moves.cbegin() + decisions.top().second, moves.end());
-               my_snake = snake_;
-
-               for (auto const& move : moves) {
-                  my_snake.toWalk(move);
-               }
-
-               possible_side
-                 = possible_side == None ? Left : possible_side; /// Undefined
-               decisions.top().first[possible_side] = true;
-
-               moves.push_back(possible_side);
-               my_snake.toWalk(possible_side);
-            }
-         }
+         my_snake.toWalk(best_move);
+         moves.push(best_move);
       }
    }
 
-   /// Movement
-   for (auto const& move : moves) {
-      m_moves.push(move);
-   }
+   m_moves = moves;
 }
 
-void GreedyPlayer::fillDistances(
-  std::vector<std::vector<int>>& distances_, Position position_) {
+std::vector<std::vector<int>> GreedyPlayer::fillDistances(
+  Position position_, std::vector<Position> non_used_) {
+   std::vector<std::vector<int>> distances { m_scene.getHeight(),
+      std::vector<int>(m_scene.getWidth(), DISTANCE_NON) };
+
+   for (Position const& pos : non_used_) {
+      distances[pos.y][pos.x] = DISTANCE_WALL;
+   }
+
    std::queue<Position> queue;
    queue.push(position_);
-   distances_[position_.y][position_.x] = DISTANCE_DEFAULT;
+   distances[position_.y][position_.x] = DISTANCE_DEFAULT;
 
    while (not queue.empty()) {
       Position current { queue.front() };
@@ -114,38 +72,41 @@ void GreedyPlayer::fillDistances(
          movementToSide(current, Up),
          movementToSide(current, Down) };
 
-      for (auto const& neighbor : neighbors) {
+      for (Position const& neighbor : neighbors) {
          if (neighbor.x >= 0 && neighbor.x < m_scene.getWidth()
            && neighbor.y >= 0 && neighbor.y < m_scene.getHeight()) {
-            if (distances_[neighbor.y][neighbor.x] == DISTANCE_NON) {
+            if (distances[neighbor.y][neighbor.x] == DISTANCE_NON) {
                Element element { m_scene.getElement(neighbor) };
 
                if (element != Wall && element != InvisibleWall) {
-                  distances_[neighbor.y][neighbor.x]
-                    = distances_[current.y][current.x] + 1;
+                  distances[neighbor.y][neighbor.x]
+                    = distances[current.y][current.x] + 1;
                   queue.push(neighbor);
+               } else {
+                  distances[neighbor.y][neighbor.x] = DISTANCE_WALL;
                }
             }
          }
       }
    }
-}
 
-bool GreedyPlayer::nonHasConflict(Snake snake_, Side side_) {
-   Position move { movementToSide(snake_.getHead(), side_) };
-
-   if (m_scene.getElement(move.x, move.y) == Wall) {
-      return false;
-   } else if (not cumulativeMovements(side_, snake_.getSide())) {
-      return false;
-   }
-
-   for (size_t body { 1 }; body != snake_.getSize(); ++body) {
-      if (move == snake_.getTail(body)) {
-         return false;
-         break;
+   for (auto& line : distances) {
+      for (auto& column : line) {
+         if (column == DISTANCE_NON) {
+            column = DISTANCE_WALL;
+         }
       }
    }
 
-   return true;
+   return distances;
+}
+
+bool GreedyPlayer::conflictHasBody(Snake snake_, Position position_) {
+   for (size_t body { 1 }; body != snake_.getSize(); ++body) {
+      if (position_ == snake_.getTail(body)) {
+         return true;
+      }
+   }
+
+   return false;
 }

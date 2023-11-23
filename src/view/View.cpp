@@ -94,8 +94,15 @@ void View::renderPlay(Game game_, int lives_base_, int foods_) {
 
 void View::renderGamingInfo(Game game_, int lives_base_, int foods_) {
    size_t lives { static_cast<size_t>(game_.getLives()) };
-   ext::fstring hearts { lives, 'H' };
-   hearts += ext::fstring { lives_base_ - lives, 'L' };
+   ext::fstring hearts;
+   for (int live { 0 }; live != lives_base_; ++live) {
+      if (live < lives) {
+         hearts += "♥";
+      } else {
+         hearts += "♡";
+      }
+   }
+
    hearts.color(ext::cfg::red);
 
    ext::fstring score { std::to_string(game_.getScore()) };
