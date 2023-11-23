@@ -1,6 +1,9 @@
 #include "Cli.hpp"
 #include "GameController.hpp"
 #include "fstring.hpp"
+#include <chrono>
+#include <thread>
+#include <iostream>
 
 GameController* GameController::m_instance = nullptr;
 
@@ -58,6 +61,12 @@ void GameController::process() {
       case Welcome:
          processData();
          break;
+      case Thinking:
+         processMovements();
+         break;
+      case Update:
+         processResults();
+         break;
       default:
          break;
    }
@@ -71,6 +80,15 @@ void GameController::update() {
       case Welcome:
          m_state = m_help ? Helping : Playing;
          break;
+      case Playing:
+         m_state = Thinking;
+         break;
+      case Thinking:
+         m_state = m_game.defeat() ? Ending : Update;
+         break;
+      case Update:
+         m_state = winnerGame() ? Ending : Playing;
+         break;
       default:
          m_state = Ending;
          break;
@@ -82,6 +100,10 @@ void GameController::render() {
       case Helping:
          m_window.renderHelp(
            DEFAULT_FPS, DEFAULT_LIVES, DEFAULT_FOODS, DEFAULT_PLAYER);
+         break;
+      case Playing:
+         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / m_fps));
+         m_window.renderPlay(m_game, m_lives, m_foods);
          break;
       default:
          break;
@@ -132,6 +154,27 @@ void GameController::processData() {
    }
 }
 
+void GameController::processMovements() {
+   m_player->thinking(m_game.getSnake(), m_game.getFruit());
+   auto moves { m_player->getMoves() };
+
+   while (not moves.empty()) {
+      if (not m_game.toWalk(moves.top())) {
+         break;
+      }
+
+      moves.pop();
+   }
+
+   m_player->clearMoves();
+}
+
+void GameController::processResults() {
+   if (m_game.winner()) {
+      updateGame();
+   }
+}
+
 void GameController::readLevelFile() {
    std::ifstream input_file { m_file };
    ext::fstring level_size;
@@ -149,7 +192,7 @@ void GameController::readLevelFile() {
       std::vector<std::vector<char>> board;
       ext::fstring line;
 
-      while (std::getline(input_file, line) && board.size() != height) {
+      while (board.size() != height && std::getline(input_file, line)) {
          std::vector<char> columns;
 
          for (auto column : line) {
@@ -182,13 +225,13 @@ void GameController::readLevelFile() {
 }
 
 void GameController::initGame() {
-   m_game = Game(m_scenes.front(), m_lives, m_foods);
+   m_game = Game(m_scenes.front(), m_lives, m_foods + 1);
    m_current_scene = 0;
 }
 
 void GameController::createPlayer() {
    if (m_type_player == DEFAULT_PLAYER) {
-      m_player = std::make_unique<RandomPlayer>();
+      m_player = std::make_unique<RandomPlayer>(m_game.getScene());
    }
 }
 
@@ -196,7 +239,10 @@ void GameController::updateGame() {
    ++m_current_scene;
 
    if (m_current_scene != m_scenes.size()) {
-      m_game
-        = Game(m_scenes[m_current_scene], m_lives, m_foods, m_game.getScore());
+      m_game = Game(
+        m_scenes[m_current_scene], m_lives, m_foods + 1, m_game.getScore());
+      createPlayer();
    }
 }
+
+bool GameController::winnerGame() { return m_current_scene == m_scenes.size(); }

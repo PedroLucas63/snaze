@@ -22,10 +22,10 @@ class Game {
    bool defeat() const;
    bool winner() const;
 
-   void toWalk(Side side_);
+   bool toWalk(Side side_);
    bool hasConflict() const;
    bool catchFruit() const;
-   
+
    private:
    Scene m_scene;
    Snake m_snake;

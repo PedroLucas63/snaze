@@ -19,9 +19,9 @@ int Game::getScore() const { return m_score; }
 
 bool Game::winner() const { return m_snake.getSize() == m_max_size; }
 
-bool Game::defeat() const { return m_lives == 0; }
+bool Game::defeat() const { return not m_lives; }
 
-void Game::toWalk(Side side_) {
+bool Game::toWalk(Side side_) {
    m_snake.toWalk(side_);
 
    if (catchFruit()) {
@@ -31,7 +31,11 @@ void Game::toWalk(Side side_) {
    } else if (hasConflict()) {
       m_snake.restart(m_scene.getBegin());
       --m_lives;
+
+      return false;
    }
+
+   return true;
 }
 
 bool Game::hasConflict() const {
@@ -39,7 +43,7 @@ bool Game::hasConflict() const {
 
    if (m_snake.hasConflict()) {
       return true;
-   } else if (m_scene.getElement(head.x, head.y)) {
+   } else if (m_scene.getElement(head.x, head.y) ==  Wall) {
       return true;
    }
 

@@ -35,31 +35,31 @@ void RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
       }
    }
 
-   if (m_scene.getElement(left) != Road) {
+   if (m_scene.getElement(left) == Wall || m_scene.getElement(left) == InvisibleWall) {
       moves[Left] = 0;
    }
-   if (m_scene.getElement(right) != Road) {
+   if (m_scene.getElement(right) == Wall || m_scene.getElement(right) == InvisibleWall) {
       moves[Right] = 0;
    }
-   if (m_scene.getElement(up) != Road) {
+   if (m_scene.getElement(up) == Wall || m_scene.getElement(up) == InvisibleWall) {
       moves[Up] = 0;
    }
-   if (m_scene.getElement(down) != Road) {
+   if (m_scene.getElement(down) == Wall || m_scene.getElement(down) == InvisibleWall) {
       moves[Down] = 0;
    }
 
    Position fruit_pos { fruit_.getPosition() };
    if (moves[Left] && head.x > fruit_pos.x) {
-      moves[Left] += 3;
+      moves[Left] += 2;
    }
    if (moves[Right] && head.x < fruit_pos.x) {
-      moves[Right] += 3;
+      moves[Right] += 2;
    }
    if (moves[Up] && head.y > fruit_pos.y) {
-      moves[Up] += 3;
+      moves[Up] += 2;
    }
    if (moves[Down] && head.y < fruit_pos.y) {
-      moves[Down] += 3;
+      moves[Down] += 2;
    }
 
    std::random_device rd;

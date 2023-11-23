@@ -1,4 +1,5 @@
 #include "SnazeConfig.hpp"
+#include "Utils.hpp"
 #include "View.hpp"
 #include "fstring.hpp"
 #include <iostream>
@@ -75,4 +76,102 @@ void View::renderHelp(int default_fps, int default_lives, int default_foods,
    std::cout
      << "    --playertype <type> Type of snake intelligence: random. Default = "
      << default_player << ".\n";
+}
+
+void View::renderPlay(Game game_, int lives_base_, int foods_) {
+   renderTitle();
+   renderGamingInfo(game_, lives_base_, foods_);
+   renderBoard(game_);
+}
+
+void View::renderGamingInfo(Game game_, int lives_base_, int foods_) {
+   ext::fstring hearts { game_.getLives(), 'H' };
+   hearts += ext::fstring { lives_base_ - game_.getLives(), 'L' };
+   hearts.color(ext::cfg::red);
+
+   ext::fstring score { std::to_string(game_.getScore()) };
+   score.align_right(WIDTH_SCORE);
+   score.color(ext::cfg::blue);
+
+   ext::fstring foods { std::to_string(game_.getSnake().getSize() - 1) };
+   foods += " of " + std::to_string(foods_);
+   foods.color(ext::cfg::yellow);
+
+   std::cout << "Lives: " << hearts << " | Score: " << score
+             << " | Foods eaten: " << foods << "\n";
+   std::cout << std::string(WIDTH, '-') << "\n\n";
+}
+
+void View::renderBoard(Game game_) {
+   Scene scene { game_.getScene() };
+   Fruit fruit { game_.getFruit() };
+   Snake snake { game_.getSnake() };
+
+   for (int y { 0 }; y != scene.getHeight(); ++y) {
+      for (int x { 0 }; x != scene.getWidth(); ++x) {
+         Position pos { x, y };
+
+         switch (scene.getElement(x, y)) {
+            case Wall:
+               std::cout << "█";
+               break;
+            case InvisibleWall:
+               std::cout << " ";
+               break;
+            case Road:
+               if (snake.getHead() == pos) {
+                  std::cout << "◊";
+                  break;
+               } else {
+                  bool found { false };
+
+                  for (size_t body { 1 }; body != snake.getSize(); ++body) {
+                     if (snake.getTail(body) == pos) {
+                        std::cout << "●";
+                        found = true;
+                     }
+                  }
+
+                  if (found) {
+                     break;
+                  }
+
+                  if (fruit.getPosition() == pos) {
+                     std::cout << "☻";
+                  } else {
+                     std::cout << " ";
+                  }
+               }
+               break;
+            case Begin:
+               if (snake.getHead() == pos) {
+                  std::cout << "◊";
+                  break;
+               } else {
+                  bool found { false };
+
+                  for (size_t body { 1 }; body != snake.getSize(); ++body) {
+                     if (snake.getTail(body) == pos) {
+                        std::cout << "●";
+                        found = true;
+                     }
+                  }
+
+                  if (found) {
+                     break;
+                  }
+
+                  if (fruit.getPosition() == pos) {
+                     std::cout << "☻";
+                  } else {
+                     std::cout << " ";
+                  }
+               }
+               break;
+            default:
+               break;
+         }
+      }
+      std::cout << "\n";
+   }
 }

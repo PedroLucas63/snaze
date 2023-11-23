@@ -33,7 +33,7 @@ class GameController {
       Helping,
       Playing,
       Thinking,
-      Checking,
+      Update,
       Ending,
    };
 
@@ -60,11 +60,15 @@ class GameController {
    ///< Process functions >//
    void processArguments();
    void processData();
+   void processMovements();
+   void processResults();
+
    void readLevelFile();
    void initGame();
    void createPlayer();
    void updateGame();
 
+   bool winnerGame();
 
    public:
    GameController() = default;
