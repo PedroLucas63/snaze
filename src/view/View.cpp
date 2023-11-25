@@ -74,7 +74,7 @@ void View::renderHelp(int default_fps, int default_lives, int default_foods,
                 "simulation. Default = "
              << default_foods << ".\n";
    std::cout
-     << "    --playertype <type> Type of snake intelligence: random. Default = "
+     << "    --playertype <type> Type of snake intelligence: random, greedy. Default = "
      << default_player << ".\n";
 }
 
@@ -83,8 +83,9 @@ void View::renderInformations(size_t levels_, int lives_, int foods_) {
    std::cout << "Levels loaded: " << levels_ << " | Snake lives: " << lives_
              << " | Apples to eat: " << foods_ << "\n";
    std::cout << std::string(WIDTH, '-') << "\n";
-   std::cout << " >>> Press <ENTER> to start the game!\n";
 }
+
+void View::renderPause() { std::cout << " >>> Press <ENTER> to continue!\n"; }
 
 void View::renderPlay(Game game_, int lives_base_, int foods_) {
    renderTitle();
@@ -120,33 +121,40 @@ void View::renderGamingInfo(Game game_, int lives_base_, int foods_) {
 
 void View::renderBoard(Game game_) {
    Scene scene { game_.getScene() };
-   Fruit fruit { game_.getFruit() };
-   Snake snake { game_.getSnake() };
 
    for (int y { 0 }; y != scene.getHeight(); ++y) {
-      for (int x { 0 }; x != scene.getWidth(); ++x) {
-         Position pos { x, y };
-
-         switch (scene.getElement(x, y)) {
-            case Wall:
-               std::cout << "█";
-               break;
-            case InvisibleWall:
-               std::cout << " ";
-               break;
-            case Road:
-               renderRoadIcon(snake, fruit, pos);
-               break;
-            case Begin:
-               renderRoadIcon(snake, fruit, pos);
-               break;
-            default:
-               break;
-         }
-      }
+      renderBoardLine(game_, y);
       std::cout << "\n";
    }
 }
+
+void View::renderBoardLine(Game game_, int y_) {
+   Scene scene { game_.getScene() };
+   Fruit fruit { game_.getFruit() };
+   Snake snake { game_.getSnake() };
+
+   for (int x { 0 }; x != scene.getWidth(); ++x) {
+      Position pos { x, y_ };
+
+      switch (scene.getElement(x, y_)) {
+         case Wall:
+            std::cout << "█";
+            break;
+         case InvisibleWall:
+            std::cout << " ";
+            break;
+         case Road:
+            renderRoadIcon(snake, fruit, pos);
+            break;
+         case Begin:
+            renderRoadIcon(snake, fruit, pos);
+            break;
+         default:
+            break;
+      }
+   }
+}
+
 void View::renderRoadIcon(Snake snake_, Fruit fruit_, Position road_position_) {
    if (snake_.getHead() == road_position_) {
       std::cout << "◊";
@@ -167,6 +175,66 @@ void View::renderRoadIcon(Snake snake_, Fruit fruit_, Position road_position_) {
    }
 }
 
-void View::renderWin() { std::cout << "\nHey, your snake won!\n"; }
+void View::renderSituation(
+  Game game_, int lives_base_, int foods_, bool winner_) {
+   renderTitle();
+   renderGamingInfo(game_, lives_base_, foods_);
 
-void View::renderLost() { std::cout << "\nHey, your snake lost!\n"; }
+   Scene scene { game_.getScene() };
+
+   int height { 4 };
+
+   int y_information { static_cast<int>((scene.getHeight() - height) / 2) };
+
+   for (int y { 0 }; y < scene.getHeight(); ++y) {
+      if (y == y_information) {
+         renderBlock(winner_);
+         y += height - 1;
+      } else {
+         renderBoardLine(game_, y);
+      }
+
+      std::cout << "\n";
+   }
+}
+
+void View::renderBlock(bool winner_) {
+   int width { WIDTH * 2 / 3 };
+
+   std::ostringstream oss;
+   oss << "┌";
+   for (auto i { 0 }; i != width; ++i) {
+      oss << "─";
+   }
+   oss << "┐";
+   ext::fstring top { oss.str() };
+
+   oss.str("");
+   oss << (winner_ ? "CONGRATULATIONS" : "SORRY") << ", anaconda "
+       << (winner_ ? "WON" : "LOST");
+   ext::fstring situation { oss.str() };
+   situation.align_center(width);
+
+   oss.str("");
+   oss << "│" << situation << "│";
+   situation = oss.str();
+
+   oss.str("");
+   oss << "Thanks for playing!";
+   ext::fstring thanks { oss.str() };
+   thanks.align_center(width);
+
+   oss.str("");
+   oss << "│" << thanks << "│";
+   thanks = oss.str();
+
+   oss.str("");
+   oss << "└";
+   for (auto i { 0 }; i != width; ++i) {
+      oss << "─";
+   }
+   oss << "┘";
+   ext::fstring bottom { oss.str() };
+
+   std::cout << top << '\n' << situation << '\n' << thanks << '\n' << bottom;
+}

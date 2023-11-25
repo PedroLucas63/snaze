@@ -34,6 +34,7 @@ class GameController {
       Welcome,
       Helping,
       Information,
+      Pause,
       Playing,
       Thinking,
       Update,
@@ -53,6 +54,7 @@ class GameController {
 
    ///< Config members >//
    bool m_help;
+   bool m_pause;
    int m_fps;
    int m_lives;
    int m_foods;

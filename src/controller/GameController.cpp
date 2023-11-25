@@ -62,7 +62,7 @@ void GameController::process() {
       case Welcome:
          processData();
          break;
-      case Information:
+      case Pause:
          pause();
          break;
       case Thinking:
@@ -85,6 +85,9 @@ void GameController::update() {
          m_state = m_help ? Helping : Information;
          break;
       case Information:
+         m_state = Pause;
+         break;
+      case Pause:
          m_state = Playing;
          break;
       case Playing:
@@ -111,15 +114,18 @@ void GameController::render() {
       case Information:
          m_window.renderInformations(m_scenes.size(), m_lives, m_foods);
          break;
+      case Pause:
+         m_window.renderPause();
+         break;
       case Playing:
          m_window.renderPlay(m_game, m_lives, m_foods);
          std::this_thread::sleep_for(std::chrono::milliseconds(1000 / m_fps));
          break;
       case Winner:
-         m_window.renderWin();
+         m_window.renderSituation(m_game, m_lives, m_foods, true);
          break;
       case Lost:
-         m_window.renderLost();
+         m_window.renderSituation(m_game, m_lives, m_foods, false);
          break;
       default:
          break;
@@ -177,6 +183,7 @@ void GameController::processMovements() {
 }
 
 void GameController::processResults() {
+   m_pause = false;
    auto moves { m_player->getMoves() };
 
    if (m_game.winner()) {
@@ -256,6 +263,7 @@ void GameController::updateGame() {
    ++m_current_scene;
 
    if (m_current_scene != m_scenes.size()) {
+      m_pause = true;
       m_game = Game(
         m_scenes[m_current_scene], m_lives, m_foods + 1, m_game.getScore());
       createPlayer();
@@ -272,6 +280,8 @@ void GameController::updateSituation() {
       m_state = Lost;
    } else if (winnerGame()) {
       m_state = Winner;
+   } else if (m_pause) {
+      m_state = Pause;
    } else {
       m_state = Playing;
    }
