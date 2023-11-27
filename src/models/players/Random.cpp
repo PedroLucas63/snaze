@@ -2,7 +2,7 @@
 #include <map>
 #include <random>
 
-void RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
+bool RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
    clearMoves();
 
    std::map<Side, int> moves {
@@ -82,4 +82,6 @@ void RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
    std::discrete_distribution<> dist { weights.begin(), weights.end() };
 
    m_moves.push(sides[dist(gen)]);
+
+   return true;
 }

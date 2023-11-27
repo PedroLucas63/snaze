@@ -178,7 +178,12 @@ void GameController::processData() {
 
 void GameController::processMovements() {
    if (m_player->getMoves().empty()) {
-      m_player->thinking(m_game.getSnake(), m_game.getFruit());
+      if (not m_player->thinking(m_game.getSnake(), m_game.getFruit())) {
+         std::cout << "Not thinking!\n";
+         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+         m_player = std::make_unique<RandomPlayer>(m_game.getScene());
+         m_player->thinking(m_game.getSnake(), m_game.getFruit());
+      }
    }
 }
 

@@ -1,6 +1,6 @@
 #include "Player.hpp"
 
-void Player::thinking(Snake snake_, Fruit fruit_) { m_moves.push(Right); }
+bool Player::thinking(Snake snake_, Fruit fruit_) { m_moves.push(Right); return true; }
 
 std::queue<Side> Player::getMoves() const { return m_moves; }
 
