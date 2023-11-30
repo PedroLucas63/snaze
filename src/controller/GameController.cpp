@@ -21,7 +21,7 @@ void GameController::destruct() {
       delete m_instance;
    }
 
-   m_instance == nullptr;
+   m_instance = nullptr;
 }
 
 void GameController::initialize(int argc, char* argv[]) {
