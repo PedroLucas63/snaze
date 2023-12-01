@@ -1,3 +1,14 @@
+/**
+ * @file GameController.cpp
+ * @author Pedro Lucas (pedrolucas.jsrn@gmail.com)
+ * @brief Implementation of the GameController class methods.
+ * @version 1.0
+ * @date 2023-12-01
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "Cli.hpp"
 #include "GameController.hpp"
 #include "fstring.hpp"
@@ -6,8 +17,11 @@
 #include <string>
 #include <thread>
 
+/// @brief Static member initialization.
 GameController* GameController::m_instance = nullptr;
 
+/// @brief Get the instance of the GameController using the singleton pattern.
+/// @return Reference to the GameController instance.
 GameController& GameController::getInstance() {
    if (m_instance == nullptr) {
       m_instance = new GameController;
@@ -16,6 +30,7 @@ GameController& GameController::getInstance() {
    return *m_instance;
 }
 
+/// @brief Destructor for the GameController instance.
 void GameController::destruct() {
    if (m_instance != nullptr) {
       delete m_instance;
@@ -24,6 +39,9 @@ void GameController::destruct() {
    m_instance = nullptr;
 }
 
+/// @brief Initialize the GameController with command-line arguments.
+/// @param argc Number of command-line arguments.
+/// @param argv Array of command-line argument strings.
 void GameController::initialize(int argc, char* argv[]) {
    ext::CLI cli;
 
@@ -52,8 +70,11 @@ void GameController::initialize(int argc, char* argv[]) {
    m_state = Starting;
 }
 
+/// @brief Check if the game is over.
+/// @return True if the game is over, false otherwise.
 bool GameController::isOver() const { return m_state == Ending; }
 
+/// @brief Process the current game state.
 void GameController::process() {
    switch (m_state) {
       case Starting:
@@ -75,7 +96,7 @@ void GameController::process() {
          break;
    }
 }
-
+/// @brief Update the game state based on the current state.
 void GameController::update() {
    switch (m_state) {
       case Starting:
@@ -105,6 +126,7 @@ void GameController::update() {
    }
 }
 
+/// @brief Render the game visuals based on the current state.
 void GameController::render() {
    switch (m_state) {
       case Helping:
@@ -131,8 +153,7 @@ void GameController::render() {
          break;
    }
 }
-
-///< Process functions >//
+/// @brief Process command-line arguments and set default values if necessary.
 void GameController::processArguments() {
    if (m_fps < MINIMUM_FPS || m_fps > MAXIMUM_FPS) {
       m_fps = DEFAULT_FPS;
@@ -167,6 +188,8 @@ void GameController::processArguments() {
    }
 }
 
+/// @brief Process game data, read level file, and initialize the game if not in
+/// help mode.
 void GameController::processData() {
    readLevelFile();
 
@@ -176,6 +199,7 @@ void GameController::processData() {
    }
 }
 
+/// @brief Process player movements, handle player decision-making.
 void GameController::processMovements() {
    if (m_player->getMoves().empty()) {
       if (not m_player->thinking(m_game.getSnake(), m_game.getFruit())) {
@@ -185,6 +209,8 @@ void GameController::processMovements() {
    }
 }
 
+/// @brief Process the results of player movements and update the game
+/// accordingly.
 void GameController::processResults() {
    m_pause = false;
    auto moves { m_player->getMoves() };
@@ -201,6 +227,7 @@ void GameController::processResults() {
    }
 }
 
+/// @brief Read the level file to set up game scenes.
 void GameController::readLevelFile() {
    std::ifstream input_file { m_file };
    ext::fstring level_size;
@@ -249,12 +276,13 @@ void GameController::readLevelFile() {
       m_help = true;
    }
 }
-
+/// @brief Initialize the game with the first scene, lives, and food count.
 void GameController::initGame() {
    m_game = Game(m_scenes.front(), m_lives, m_foods + 1);
    m_current_scene = 0;
 }
 
+/// @brief Create the player based on the specified player type.
 void GameController::createPlayer() {
    if (m_type_player == DEFAULT_PLAYER) {
       m_player = std::make_unique<RandomPlayer>(m_game.getScene());
@@ -263,6 +291,7 @@ void GameController::createPlayer() {
    }
 }
 
+/// @brief Update the game state after a scene is completed.
 void GameController::updateGame() {
    ++m_current_scene;
 
@@ -274,11 +303,13 @@ void GameController::updateGame() {
    }
 }
 
+/// @brief Pause the game until the user presses Enter.
 void GameController::pause() {
    std::string buffer;
    std::getline(std::cin, buffer);
 }
 
+/// @brief Update the game situation based on various conditions.
 void GameController::updateSituation() {
    if (m_game.defeat()) {
       m_state = Lost;
@@ -291,4 +322,6 @@ void GameController::updateSituation() {
    }
 }
 
+/// @brief Check if the player has won the entire game.
+/// @return True if the player has won, false otherwise.
 bool GameController::winnerGame() { return m_current_scene == m_scenes.size(); }
