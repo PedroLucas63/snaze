@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(
-  Snaze
+  snaze
   VERSION 0.1
   LANGUAGES C CXX)
 
@@ -9,7 +9,7 @@ enable_testing()
 
 configure_file(config/SnazeConfig.hpp.in SnazeConfig.hpp)
 include_directories(
-  Snaze
+  snaze
   PUBLIC
   "${PROJECT_BINARY_DIR}"
   src/models
@@ -25,7 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
 add_executable(
-  Snaze
+  snaze
   src/main.cpp
   src/models/players/Random.cpp
   src/models/Fruit.cpp
