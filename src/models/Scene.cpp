@@ -18,6 +18,7 @@ Position Scene::getBegin() const { return m_begin; }
 
 bool Scene::validate() const {
    int begins { 0 };
+   int y { 0 }, x { 0 };
 
    for (auto line : m_board) {
       for (auto column : line) {
@@ -28,7 +29,22 @@ bool Scene::validate() const {
          } else if (element == Begin) {
             ++begins;
          }
+
+         if (y == 0 || y == getHeight() - 1) {
+            if (element != Wall && element != InvisibleWall) {
+               return false;
+            }
+         } else if (x == 0 || x == getWidth() - 1) {
+            if (element != Wall && element != InvisibleWall) {
+               return false;
+            }
+         }
+
+         ++x;
       }
+
+      x = 0;
+      ++y;
    }
 
    return begins == 1;

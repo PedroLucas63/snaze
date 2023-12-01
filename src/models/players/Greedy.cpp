@@ -102,7 +102,7 @@ std::vector<std::vector<int>> GreedyPlayer::fillDistances(
 }
 
 bool GreedyPlayer::conflictHasBody(Snake snake_, Position position_) {
-   for (size_t body { 1 }; body != snake_.getSize(); ++body) {
+   for (size_t body { 1 }; body < snake_.getSize() - 1; ++body) {
       if (position_ == snake_.getTail(body)) {
          return true;
       }

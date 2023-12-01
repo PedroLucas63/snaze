@@ -25,7 +25,7 @@ bool RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
    Position up { movementToSide(head, Up) };
    Position down { movementToSide(head, Down) };
 
-   for (auto body { 1 }; body != snake_.getSize(); ++body) {
+   for (auto body { 1 }; body < snake_.getSize() - 1; ++body) {
       if (left == snake_.getTail(body)) {
          moves[Left] = 0;
       } else if (right == snake_.getTail(body)) {
