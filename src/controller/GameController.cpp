@@ -21,7 +21,7 @@ void GameController::destruct() {
       delete m_instance;
    }
 
-   m_instance == nullptr;
+   m_instance = nullptr;
 }
 
 void GameController::initialize(int argc, char* argv[]) {
@@ -178,7 +178,10 @@ void GameController::processData() {
 
 void GameController::processMovements() {
    if (m_player->getMoves().empty()) {
-      m_player->thinking(m_game.getSnake(), m_game.getFruit());
+      if (not m_player->thinking(m_game.getSnake(), m_game.getFruit())) {
+         m_player = std::make_unique<RandomPlayer>(m_game.getScene());
+         m_player->thinking(m_game.getSnake(), m_game.getFruit());
+      }
    }
 }
 
@@ -191,6 +194,7 @@ void GameController::processResults() {
    } else {
       if (not m_game.toWalk(m_player->frontMovement())) {
          m_player->clearMoves();
+         createPlayer();
       } else {
          m_player->popMovement();
       }

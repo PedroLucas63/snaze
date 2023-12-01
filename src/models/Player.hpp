@@ -12,7 +12,7 @@ class Player {
    Player() = default;
    Player(Scene scene_) : m_scene(scene_), m_side(None) { }
 
-   virtual void thinking(Snake snake_, Fruit fruit_);
+   virtual bool thinking(Snake snake_, Fruit fruit_);
    std::queue<Side> getMoves() const;
    Side frontMovement() const;
    void popMovement();

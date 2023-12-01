@@ -2,7 +2,7 @@
 #include <iostream>
 #include <map>
 
-void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
+bool GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
    Snake my_snake { snake_ };
 
    std::vector<Position> exclude;
@@ -21,8 +21,7 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
       }
 
       if (move_distance.empty()) {
-         moves.push(Left); /// Defeat
-         break;
+         return false;
       }
 
       Side best_move { move_distance.begin()->first };
@@ -48,6 +47,7 @@ void GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
    }
 
    m_moves = moves;
+   return true;
 }
 
 std::vector<std::vector<int>> GreedyPlayer::fillDistances(

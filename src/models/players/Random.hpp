@@ -8,7 +8,7 @@ class RandomPlayer : public Player {
    RandomPlayer() : Player() { }
    RandomPlayer(Scene scene_) : Player(scene_) { }
 
-   void thinking(Snake snake_, Fruit fruit_) override;
+   bool thinking(Snake snake_, Fruit fruit_) override;
 };
 
 #endif /// RANDOM_PLAYER_HPP_

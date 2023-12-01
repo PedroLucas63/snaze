@@ -14,7 +14,7 @@ class GreedyPlayer : public Player {
    GreedyPlayer() : Player() { }
    GreedyPlayer(Scene scene_) : Player(scene_) { }
 
-   void thinking(Snake snake_, Fruit fruit_) override;
+   bool thinking(Snake snake_, Fruit fruit_) override;
 
    private:
    std::vector<std::vector<int>> fillDistances(
