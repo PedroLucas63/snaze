@@ -1,7 +1,24 @@
+/**
+ * @file Greedy.cpp
+ * @author Pedro Lucas (pedrolucas.jsrn@gmail.com)
+ * @brief Implementation file for the GreedyPlayer class and its methods in the
+ * Snaze game.
+ * @version 1.0
+ * @date 2023-12-01
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "Greedy.hpp"
 #include <iostream>
 #include <map>
 
+/// @brief Determine the next move of the player based on the shortest path
+/// to the fruit.
+/// @param snake_ The current state of the snake.
+/// @param fruit_ The current state of the fruit.
+/// @return True if the player has made a valid move, false otherwise.
 bool GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
    Snake my_snake { snake_ };
 
@@ -50,6 +67,11 @@ bool GreedyPlayer::thinking(Snake snake_, Fruit fruit_) {
    return true;
 }
 
+/// @brief Fill distances from the given position to other positions on the
+/// board.
+/// @param position_ The starting position.
+/// @param non_used_ A vector of positions that are not used.
+/// @return A 2D vector representing distances from the starting position.
 std::vector<std::vector<int>> GreedyPlayer::fillDistances(
   Position position_, std::vector<Position> non_used_) {
    std::vector<std::vector<int>> distances { m_scene.getHeight(),
@@ -101,6 +123,11 @@ std::vector<std::vector<int>> GreedyPlayer::fillDistances(
    return distances;
 }
 
+/// @brief Check if the given position conflicts with the snake's body.
+/// @param snake_ The current state of the snake.
+/// @param position_ The position to check for conflicts.
+/// @return True if the position conflicts with the snake's body, false
+/// otherwise.
 bool GreedyPlayer::conflictHasBody(Snake snake_, Position position_) {
    for (size_t body { 1 }; body < snake_.getSize() - 1; ++body) {
       if (position_ == snake_.getTail(body)) {

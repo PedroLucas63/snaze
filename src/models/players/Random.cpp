@@ -1,7 +1,23 @@
+/**
+ * @file Random.cpp
+ * @author Pedro Lucas (pedrolucas.jsrn@gmail.com)
+ * @brief Implementation file for the RandomPlayer class and its methods in the
+ * Snaze game.
+ * @version 1.0
+ * @date 2023-12-01
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "Random.hpp"
 #include <map>
 #include <random>
 
+/// @brief Determine the next random move of the player.
+/// @param snake_ The current state of the snake.
+/// @param fruit_ The current state of the fruit.
+/// @return True if the player has made a valid move, false otherwise.
 bool RandomPlayer::thinking(Snake snake_, Fruit fruit_) {
    clearMoves();
 
