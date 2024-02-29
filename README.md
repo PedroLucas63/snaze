@@ -76,4 +76,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact 📧
 
 Made by ❤️ Pedro Lucas
+
 Contact me at pedrolucas.jsrn@gmail.com.
